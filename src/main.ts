@@ -1,16 +1,20 @@
 import {
   FaceDetector,
   FilesetResolver,
+  Detection,
 } from "@mediapipe/tasks-vision";
 
 class FaceDetectionApp {
     video: HTMLVideoElement;
     anomalyList: HTMLUListElement;
+    liveView: HTMLDivElement;
     faceDetector: FaceDetector | null;
+    children: HTMLElement[];
 
     constructor(videoElementId: string, anomalyListId: string) {
         const videoElement = document.getElementById(videoElementId);
         const anomalyElement = document.getElementById(anomalyListId);
+        const liveViewElement = document.getElementById("liveView");
 
         if (!(videoElement instanceof HTMLVideoElement)) {
             throw new Error(`Element with ID ${videoElementId} is not a valid HTMLVideoElement.`);
@@ -18,10 +22,15 @@ class FaceDetectionApp {
         if (!(anomalyElement instanceof HTMLUListElement)) {
             throw new Error(`Element with ID ${anomalyListId} is not a valid HTMLUListElement.`);
         }
+        if (!(liveViewElement instanceof HTMLDivElement)) {
+            throw new Error(`Element with ID liveView is not a valid HTMLDivElement.`);
+        }
 
         this.video = videoElement;
         this.anomalyList = anomalyElement;
+        this.liveView = liveViewElement;
         this.faceDetector = null;
+        this.children = [];
     }
 
     async initialize(): Promise<void> {
@@ -56,7 +65,7 @@ class FaceDetectionApp {
     startFaceDetection(): void {
         setInterval(() => {
             this.detectFace();
-        }, 3000);
+        }, 1000);
     }
 
     createCanvasElement(videoElement: HTMLVideoElement): HTMLCanvasElement {
@@ -79,6 +88,10 @@ class FaceDetectionApp {
         const result = await this.faceDetector.detect(canvas);
         const detections = result.detections;
 
+        // Display visual detections
+        this.displayImageDetections(detections, this.video);
+
+        // Keep anomaly list functionality
         if (detections.length === 0) {
             this.addAnomaly('No person detected');
         } else if (detections.length > 1) {
@@ -115,6 +128,76 @@ class FaceDetectionApp {
         li.textContent = `${timestamp}: ${type}`;
         this.anomalyList.appendChild(li);
         this.anomalyList.scrollTop = this.anomalyList.scrollHeight;
+    }
+
+    displayImageDetections(detections: Detection[], resultElement: HTMLVideoElement): void {
+        // Remove any highlighting from previous frame
+        for (let child of this.children) {
+            this.liveView.removeChild(child);
+        }
+        this.children.splice(0);
+
+        const ratio = resultElement.height / resultElement.videoHeight;
+
+        for (let detection of detections) {
+            if (!detection.boundingBox) continue;
+
+            const score = typeof detection.categories[0].score === 'number' 
+                ? detection.categories[0].score 
+                : parseFloat(String(detection.categories[0].score));
+
+            // Confidence text
+            const p = document.createElement("p");
+            p.setAttribute("class", "info");
+            p.innerText =
+                "Confidence: " +
+                Math.round(score * 100) +
+                "% .";
+            p.style =
+                "left: " +
+                detection.boundingBox.originX * ratio +
+                "px;" +
+                "top: " +
+                (detection.boundingBox.originY * ratio - 30) +
+                "px; " +
+                "width: " +
+                (detection.boundingBox.width * ratio - 10) +
+                "px;";
+
+            // Bounding box highlighter
+            const highlighter = document.createElement("div");
+            highlighter.setAttribute("class", "highlighter");
+            highlighter.style =
+                "left: " +
+                detection.boundingBox.originX * ratio +
+                "px;" +
+                "top: " +
+                detection.boundingBox.originY * ratio +
+                "px;" +
+                "width: " +
+                detection.boundingBox.width * ratio +
+                "px;" +
+                "height: " +
+                detection.boundingBox.height * ratio +
+                "px;";
+
+            this.liveView.appendChild(highlighter);
+            this.liveView.appendChild(p);
+            this.children.push(highlighter);
+            this.children.push(p);
+
+            // Keypoints
+            if (detection.keypoints) {
+                for (let keypoint of detection.keypoints) {
+                    const keypointEl = document.createElement("span");
+                    keypointEl.className = "key-point";
+                    keypointEl.style.top = `${keypoint.y * resultElement.height - 3}px`;
+                    keypointEl.style.left = `${keypoint.x * resultElement.width - 3}px`;
+                    this.liveView.appendChild(keypointEl);
+                    this.children.push(keypointEl);
+                }
+            }
+        }
     }
 }
 

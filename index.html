@@ -8,7 +8,10 @@
 </head>
 <body>
   <div class="container">
-    <video id="webcam" width="640" height="480" autoplay></video>
+    <div style="position: relative;">
+      <video id="webcam" width="640" height="480" autoplay></video>
+      <div id="liveView"></div>
+    </div>
     <div id="anomalyContainer">
         <h4>Anomalies Detected:</h4>
         <ul id="anomalyList"></ul>
