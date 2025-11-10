@@ -4,18 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Face Detection App</title>
-  <script type="module" crossorigin src="/facedetection_test/assets/index-COh3Id5F.js"></script>
-  <link rel="stylesheet" crossorigin href="/facedetection_test/assets/index-DreIYSIM.css">
+  <script type="module" crossorigin src="/facedetection_test/assets/index-BZ0IBPA6.js"></script>
+  <link rel="stylesheet" crossorigin href="/facedetection_test/assets/index-Cam0viIf.css">
 </head>
 <body>
   <div class="container">
-    <div style="position: relative;">
-      <video id="webcam" width="640" height="480" autoplay></video>
-      <div id="liveView"></div>
-    </div>
-    <div id="anomalyContainer">
-        <h4>Anomalies Detected:</h4>
-        <ul id="anomalyList"></ul>
+    <div class="webcam-card">
+      <!-- Header -->
+      <div class="webcam-header">
+        <div class="header-left">
+          <span>Webcam Monitor</span>
+        </div>
+        <div id="warningIndicator" class="warning-indicator hidden">
+          <span class="pulse-dot">
+            <span class="pulse-ring"></span>
+            <span class="pulse-core"></span>
+          </span>
+          <span id="warningText"></span>
+        </div>
+      </div>
+      <!-- Video -->
+      <div class="video-container">
+        <video id="webcam" width="640" height="480" autoplay playsinline muted></video>
+        <div id="liveView"></div>
+        <div id="videoOverlay" class="video-overlay hidden"></div>
+      </div>
     </div>
   </div>
 </body>
