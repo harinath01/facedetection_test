@@ -6,29 +6,47 @@ import {
 
 class FaceDetectionApp {
     video: HTMLVideoElement;
-    anomalyList: HTMLUListElement;
+    warningIndicator: HTMLDivElement;
+    warningText: HTMLSpanElement;
+    videoOverlay: HTMLDivElement;
+    webcamCard: HTMLDivElement;
     liveView: HTMLDivElement;
     faceDetector: FaceDetector | null;
     children: HTMLElement[];
 
-    constructor(videoElementId: string, anomalyListId: string) {
+    constructor(videoElementId: string) {
         const videoElement = document.getElementById(videoElementId);
-        const anomalyElement = document.getElementById(anomalyListId);
         const liveViewElement = document.getElementById("liveView");
+        const warningIndicatorElement = document.getElementById("warningIndicator");
+        const warningTextElement = document.getElementById("warningText");
+        const videoOverlayElement = document.getElementById("videoOverlay");
+        const webcamCardElement = document.querySelector(".webcam-card");
 
         if (!(videoElement instanceof HTMLVideoElement)) {
             throw new Error(`Element with ID ${videoElementId} is not a valid HTMLVideoElement.`);
         }
-        if (!(anomalyElement instanceof HTMLUListElement)) {
-            throw new Error(`Element with ID ${anomalyListId} is not a valid HTMLUListElement.`);
-        }
         if (!(liveViewElement instanceof HTMLDivElement)) {
             throw new Error(`Element with ID liveView is not a valid HTMLDivElement.`);
         }
+        if (!(warningIndicatorElement instanceof HTMLDivElement)) {
+            throw new Error(`Element with ID warningIndicator is not a valid HTMLDivElement.`);
+        }
+        if (!(warningTextElement instanceof HTMLSpanElement)) {
+            throw new Error(`Element with ID warningText is not a valid HTMLSpanElement.`);
+        }
+        if (!(videoOverlayElement instanceof HTMLDivElement)) {
+            throw new Error(`Element with ID videoOverlay is not a valid HTMLDivElement.`);
+        }
+        if (!(webcamCardElement instanceof HTMLDivElement)) {
+            throw new Error(`Element with class webcam-card is not a valid HTMLDivElement.`);
+        }
 
         this.video = videoElement;
-        this.anomalyList = anomalyElement;
         this.liveView = liveViewElement;
+        this.warningIndicator = warningIndicatorElement;
+        this.warningText = warningTextElement;
+        this.videoOverlay = videoOverlayElement;
+        this.webcamCard = webcamCardElement;
         this.faceDetector = null;
         this.children = [];
     }
@@ -93,43 +111,27 @@ class FaceDetectionApp {
         // Display visual detections
         this.displayImageDetections(detections, this.video);
 
-        // Keep anomaly list functionality
+        // Show anomaly label if detected
         if (detections.length === 0) {
-            this.addAnomaly('No person detected');
+            this.showAnomaly('No person detected');
         } else if (detections.length > 1) {
-            this.addAnomaly('Multiple persons detected');
+            this.showAnomaly('Multiple persons detected');
         } else {
-            this.addAnomaly('Person detected');
-
-            if (this.isFaceTurned(detections[0])) {
-                this.addAnomaly('Face turned');
-            }
+            this.hideAnomaly();
         }
     }
 
-    isFaceTurned(detection: any): boolean {
-        const landmarks = detection.keypoints;
-        const imageWidth = detection.boundingBox.width;
-        const leftEyeX = landmarks[0].x * imageWidth;
-        const rightEyeX = landmarks[1].x * imageWidth;
-        const jawLeftX = landmarks[4].x * imageWidth;
-        const jawRightX = landmarks[5].x * imageWidth;
-        const faceWidth = jawRightX - jawLeftX;
-        const faceCenterX = (jawLeftX + jawRightX) / 2;
-
-        const threshold = 0.15;
-        return (
-            Math.abs(leftEyeX - faceCenterX) < faceWidth * threshold ||
-            Math.abs(rightEyeX - faceCenterX) < faceWidth * threshold
-        );
+    showAnomaly(message: string): void {
+        this.warningText.textContent = message;
+        this.warningIndicator.classList.remove('hidden');
+        this.videoOverlay.classList.remove('hidden');
+        this.webcamCard.classList.add('warning');
     }
 
-    addAnomaly(type: string): void {
-        const timestamp = new Date().toLocaleTimeString();
-        const li = document.createElement('li');
-        li.textContent = `${timestamp}: ${type}`;
-        this.anomalyList.appendChild(li);
-        this.anomalyList.scrollTop = this.anomalyList.scrollHeight;
+    hideAnomaly(): void {
+        this.warningIndicator.classList.add('hidden');
+        this.videoOverlay.classList.add('hidden');
+        this.webcamCard.classList.remove('warning');
     }
 
     displayImageDetections(detections: Detection[], resultElement: HTMLVideoElement): void {
@@ -139,7 +141,35 @@ class FaceDetectionApp {
         }
         this.children.splice(0);
 
-        const ratio = resultElement.height / resultElement.videoHeight;
+        // Get the displayed video dimensions
+        const displayedWidth = resultElement.offsetWidth;
+        const displayedHeight = resultElement.offsetHeight;
+        const naturalWidth = resultElement.videoWidth;
+        const naturalHeight = resultElement.videoHeight;
+
+        // Calculate scale factors for object-fit: cover
+        // The video maintains aspect ratio and fills the container
+        const videoAspect = naturalWidth / naturalHeight;
+        const containerAspect = displayedWidth / displayedHeight;
+        
+        let scaleX: number;
+        let scaleY: number;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        if (videoAspect > containerAspect) {
+            // Video is wider - scale by height, crop width
+            scaleY = displayedHeight / naturalHeight;
+            scaleX = scaleY;
+            const scaledWidth = naturalWidth * scaleX;
+            offsetX = (displayedWidth - scaledWidth) / 2;
+        } else {
+            // Video is taller - scale by width, crop height
+            scaleX = displayedWidth / naturalWidth;
+            scaleY = scaleX;
+            const scaledHeight = naturalHeight * scaleY;
+            offsetY = (displayedHeight - scaledHeight) / 2;
+        }
 
         for (let detection of detections) {
             if (!detection.boundingBox) continue;
@@ -148,6 +178,12 @@ class FaceDetectionApp {
                 ? detection.categories[0].score 
                 : parseFloat(String(detection.categories[0].score));
 
+            // Calculate positions accounting for scaling and offset
+            const left = detection.boundingBox.originX * scaleX + offsetX;
+            const top = detection.boundingBox.originY * scaleY + offsetY;
+            const width = detection.boundingBox.width * scaleX;
+            const height = detection.boundingBox.height * scaleY;
+
             // Confidence text
             const p = document.createElement("p");
             p.setAttribute("class", "info");
@@ -155,17 +191,17 @@ class FaceDetectionApp {
                 "Confidence: " +
                 Math.round(score * 100) +
                 "% .";
-            p.style.left = detection.boundingBox.originX * ratio + "px";
-            p.style.top = (detection.boundingBox.originY * ratio - 30) + "px";
-            p.style.width = (detection.boundingBox.width * ratio - 10) + "px";
+            p.style.left = left + "px";
+            p.style.top = (top - 30) + "px";
+            p.style.width = (width - 10) + "px";
 
             // Bounding box highlighter
             const highlighter = document.createElement("div");
             highlighter.setAttribute("class", "highlighter");
-            highlighter.style.left = detection.boundingBox.originX * ratio + "px";
-            highlighter.style.top = detection.boundingBox.originY * ratio + "px";
-            highlighter.style.width = detection.boundingBox.width * ratio + "px";
-            highlighter.style.height = detection.boundingBox.height * ratio + "px";
+            highlighter.style.left = left + "px";
+            highlighter.style.top = top + "px";
+            highlighter.style.width = width + "px";
+            highlighter.style.height = height + "px";
 
             this.liveView.appendChild(highlighter);
             this.liveView.appendChild(p);
@@ -177,8 +213,11 @@ class FaceDetectionApp {
                 for (let keypoint of detection.keypoints) {
                     const keypointEl = document.createElement("span");
                     keypointEl.className = "key-point";
-                    keypointEl.style.top = `${keypoint.y * resultElement.height - 3}px`;
-                    keypointEl.style.left = `${keypoint.x * resultElement.width - 3}px`;
+                    // Keypoints are normalized (0-1), so multiply by natural dimensions then scale
+                    const keypointX = keypoint.x * naturalWidth * scaleX + offsetX;
+                    const keypointY = keypoint.y * naturalHeight * scaleY + offsetY;
+                    keypointEl.style.left = `${keypointX - 3}px`;
+                    keypointEl.style.top = `${keypointY - 3}px`;
                     this.liveView.appendChild(keypointEl);
                     this.children.push(keypointEl);
                 }
@@ -188,6 +227,6 @@ class FaceDetectionApp {
 }
 
 // Instantiate and initialize the app
-const faceDetectionApp = new FaceDetectionApp("webcam", "anomalyList");
+const faceDetectionApp = new FaceDetectionApp("webcam");
 faceDetectionApp.initialize();
 

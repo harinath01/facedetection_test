@@ -9,20 +9,120 @@ body {
 
 .container {
     display: flex;
+    width: 100%;
+    justify-content: center;
+}
+
+.webcam-card {
+    width: 100%;
+    max-width: 640px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s;
+    background: white;
+    color: #1f2937;
+}
+
+.webcam-card.warning {
+    background: linear-gradient(to bottom, #dc2626, #ef4444);
+    color: white;
+}
+
+.webcam-header {
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.warning-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.warning-indicator.hidden {
+    display: none;
+}
+
+.pulse-dot {
+    position: relative;
+    display: inline-flex;
+    height: 8px;
+    width: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.pulse-ring {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    background-color: currentColor;
+    opacity: 0.75;
+    animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.pulse-core {
+    position: relative;
+    display: inline-flex;
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    background-color: currentColor;
+}
+
+@keyframes ping {
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 0 0 8px 8px;
 }
 
 video {
-    border: 1px solid #ccc;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.9;
+    transition: all 0.3s;
 }
 
-#anomalyContainer {
-    margin-left: 20px;
-    border: 1px solid #ccc;
-    padding: 10px;
-    background-color: #fff;
-    width: 300px;
-    max-height: 500px;
-    overflow-y: auto;
+.video-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    transition: all 0.3s;
+    background-color: rgba(239, 68, 68, 0.3);
+    z-index: 1;
+}
+
+.video-overlay.hidden {
+    background-color: transparent;
 }
 
 #liveView {
@@ -32,13 +132,14 @@ video {
     width: 100%;
     height: 100%;
     pointer-events: none;
+    z-index: 2;
 }
 
 .highlighter {
     position: absolute;
     border: 2px solid #00ff00;
     background-color: transparent;
-    z-index: 1;
+    z-index: 3;
 }
 
 .info {
@@ -48,7 +149,7 @@ video {
     padding: 2px 5px;
     font-size: 12px;
     font-weight: bold;
-    z-index: 2;
+    z-index: 4;
 }
 
 .key-point {
@@ -57,5 +158,5 @@ video {
     height: 6px;
     background-color: #ff0000;
     border-radius: 50%;
-    z-index: 3;
+    z-index: 5;
 }

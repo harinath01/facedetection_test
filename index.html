@@ -8,13 +8,26 @@
 </head>
 <body>
   <div class="container">
-    <div style="position: relative;">
-      <video id="webcam" width="640" height="480" autoplay></video>
-      <div id="liveView"></div>
-    </div>
-    <div id="anomalyContainer">
-        <h4>Anomalies Detected:</h4>
-        <ul id="anomalyList"></ul>
+    <div class="webcam-card">
+      <!-- Header -->
+      <div class="webcam-header">
+        <div class="header-left">
+          <span>Webcam Monitor</span>
+        </div>
+        <div id="warningIndicator" class="warning-indicator hidden">
+          <span class="pulse-dot">
+            <span class="pulse-ring"></span>
+            <span class="pulse-core"></span>
+          </span>
+          <span id="warningText"></span>
+        </div>
+      </div>
+      <!-- Video -->
+      <div class="video-container">
+        <video id="webcam" width="640" height="480" autoplay playsinline muted></video>
+        <div id="liveView"></div>
+        <div id="videoOverlay" class="video-overlay hidden"></div>
+      </div>
     </div>
   </div>
   <script type="module" src="/src/main.ts"></script>
