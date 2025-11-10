@@ -153,33 +153,17 @@ class FaceDetectionApp {
                 "Confidence: " +
                 Math.round(score * 100) +
                 "% .";
-            p.style =
-                "left: " +
-                detection.boundingBox.originX * ratio +
-                "px;" +
-                "top: " +
-                (detection.boundingBox.originY * ratio - 30) +
-                "px; " +
-                "width: " +
-                (detection.boundingBox.width * ratio - 10) +
-                "px;";
+            p.style.left = detection.boundingBox.originX * ratio + "px";
+            p.style.top = (detection.boundingBox.originY * ratio - 30) + "px";
+            p.style.width = (detection.boundingBox.width * ratio - 10) + "px";
 
             // Bounding box highlighter
             const highlighter = document.createElement("div");
             highlighter.setAttribute("class", "highlighter");
-            highlighter.style =
-                "left: " +
-                detection.boundingBox.originX * ratio +
-                "px;" +
-                "top: " +
-                detection.boundingBox.originY * ratio +
-                "px;" +
-                "width: " +
-                detection.boundingBox.width * ratio +
-                "px;" +
-                "height: " +
-                detection.boundingBox.height * ratio +
-                "px;";
+            highlighter.style.left = detection.boundingBox.originX * ratio + "px";
+            highlighter.style.top = detection.boundingBox.originY * ratio + "px";
+            highlighter.style.width = detection.boundingBox.width * ratio + "px";
+            highlighter.style.height = detection.boundingBox.height * ratio + "px";
 
             this.liveView.appendChild(highlighter);
             this.liveView.appendChild(p);
