@@ -4,12 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Face Detection App</title>
-  <script type="module" crossorigin src="/facedetection_test/assets/index-8vIYCbKM.js"></script>
-  <link rel="stylesheet" crossorigin href="/facedetection_test/assets/index-B_TVyer9.css">
+  <script type="module" crossorigin src="/facedetection_test/assets/index-CpMYVEnk.js"></script>
+  <link rel="stylesheet" crossorigin href="/facedetection_test/assets/index-DreIYSIM.css">
 </head>
 <body>
   <div class="container">
-    <video id="webcam" width="640" height="480" autoplay></video>
+    <div style="position: relative;">
+      <video id="webcam" width="640" height="480" autoplay></video>
+      <div id="liveView"></div>
+    </div>
     <div id="anomalyContainer">
         <h4>Anomalies Detected:</h4>
         <ul id="anomalyList"></ul>
