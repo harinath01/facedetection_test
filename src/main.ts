@@ -181,7 +181,7 @@ class FaceDetectionApp {
         this.faceDetector = await FaceDetector.createFromOptions(vision, {
             baseOptions: {
                 modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite`,
-                delegate: "GPU"
+                delegate: "CPU"
             },
             minDetectionConfidence: 0.55,
             minSuppressionThreshold: 0.7,     
