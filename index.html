@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Face Detection App</title>
-  <script type="module" crossorigin src="/facedetection_test/assets/index-BZ0IBPA6.js"></script>
-  <link rel="stylesheet" crossorigin href="/facedetection_test/assets/index-Cam0viIf.css">
+  <script type="module" crossorigin src="/facedetection_test/assets/index-CBrqu-Tm.js"></script>
+  <link rel="stylesheet" crossorigin href="/facedetection_test/assets/index-BgmRX8vo.css">
 </head>
 <body>
   <div class="container">
@@ -28,6 +28,27 @@
         <video id="webcam" width="640" height="480" autoplay playsinline muted></video>
         <div id="liveView"></div>
         <div id="videoOverlay" class="video-overlay hidden"></div>
+      </div>
+    </div>
+    <!-- System Configuration -->
+    <div class="config-card">
+      <div class="config-header">
+        <span>System Configuration</span>
+      </div>
+      <div id="configContent" class="config-content">
+        <div id="systemInfo"></div>
+      </div>
+    </div>
+    <!-- Console Output -->
+    <div class="config-card">
+      <div class="config-header">
+        <span>Console Output</span>
+        <div class="console-controls">
+          <button id="clearConsole" class="console-btn" title="Clear console">Clear</button>
+        </div>
+      </div>
+      <div id="consoleContent" class="console-content">
+        <div id="consoleOutput"></div>
       </div>
     </div>
   </div>
