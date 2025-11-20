@@ -190,7 +190,8 @@ class FaceDetectionApp {
                 modelAssetPath: MEDIAPIPE_MODEL_URL,
                 delegate: "GPU"
             },
-            minDetectionConfidence: 0.75,   
+            minDetectionConfidence: 0.75,
+            minSuppressionThreshold: 0.75,
             runningMode: "IMAGE"
         });
     }
