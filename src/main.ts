@@ -220,7 +220,6 @@ class FaceDetectionApp {
         const canvas = this.createCanvasElement(this.video);
         const result = await this.faceDetector.detect(canvas);
         const detections = result.detections;
-        console.log(detections);
 
         // Display visual detections
         this.displayImageDetections(detections, this.video);
