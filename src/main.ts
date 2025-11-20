@@ -4,6 +4,13 @@ import {
   Detection,
 } from "@mediapipe/tasks-vision";
 
+
+const MEDIAPIPE_VISION_URL =
+  "https://static.testpress.in/static/mediapipe/tasks-vision/wasm";
+const MEDIAPIPE_MODEL_URL =
+  "https://static.testpress.in/static/mediapipe/models/blaze_face_short_range.tflite";
+
+
 class FaceDetectionApp {
     video: HTMLVideoElement;
     warningIndicator: HTMLDivElement;
@@ -176,11 +183,11 @@ class FaceDetectionApp {
 
     async initializeMediaPipes(): Promise<void> {
         const vision = await FilesetResolver.forVisionTasks(
-            "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
+            MEDIAPIPE_VISION_URL
         );
         this.faceDetector = await FaceDetector.createFromOptions(vision, {
             baseOptions: {
-                modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite`,
+                modelAssetPath: MEDIAPIPE_MODEL_URL,
                 delegate: "GPU"
             },
             minDetectionConfidence: 0.75,   
