@@ -188,7 +188,7 @@ class FaceDetectionApp {
         this.faceDetector = await FaceDetector.createFromOptions(vision, {
             baseOptions: {
                 modelAssetPath: MEDIAPIPE_MODEL_URL,
-                delegate: "GPU"
+                delegate: "CPU"
             },
             minDetectionConfidence: 0.75,
             minSuppressionThreshold: 0.2,
