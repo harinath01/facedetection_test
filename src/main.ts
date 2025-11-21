@@ -6,7 +6,7 @@ import {
 
 
 const MEDIAPIPE_VISION_URL =
-  "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.10/wasm";
+  "https://static.testpress.in/static/mediapipe/tasks-vision/wasm";
 const MEDIAPIPE_MODEL_URL =
   "https://static.testpress.in/static/mediapipe/models/blaze_face_short_range.tflite";
 
