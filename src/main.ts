@@ -191,7 +191,7 @@ class FaceDetectionApp {
                 delegate: "GPU"
             },
             minDetectionConfidence: 0.75,
-            minSuppressionThreshold: 0.75,
+            minSuppressionThreshold: 0.2,
             runningMode: "IMAGE"
         });
     }
